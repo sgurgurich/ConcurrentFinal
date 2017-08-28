@@ -20,6 +20,7 @@ public class DownloadThread implements Runnable{
 	
 	// downloads the file and adds it to converter_queue as a BufferedImage
 	public void run(){
+		long startTime = System.currentTimeMillis();  // Start timing
 		BufferedImage img = null;
 		try {
 			URL url = new URL(url_str);
@@ -31,7 +32,12 @@ public class DownloadThread implements Runnable{
 			// TODO Auto-generated catch block
 		    //e.printStackTrace();
 		}
+		long endTime = System.currentTimeMillis();  // Start timing
 
+		long final_time = endTime - startTime;
+		
+		System.out.println("Start" + startTime + "Final: " + final_time);
+		
 	}
 	
 	// overloaded to stop this thread if there's an issue

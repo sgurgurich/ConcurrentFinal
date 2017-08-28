@@ -20,6 +20,8 @@ public class SaveThread implements Runnable{
 	public void run(){
 		while(true){
 			if (!save_queue.isEmpty()){
+				
+				long startTime = System.currentTimeMillis();  // Start timing
 				BufferedImage tmp;
 				try {
 
@@ -37,6 +39,12 @@ public class SaveThread implements Runnable{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				
+
+				long endTime = System.currentTimeMillis();  // Start timing
+
+				long final_time = endTime - startTime;
+				System.out.println(final_time);
 			}
 		}
 	}

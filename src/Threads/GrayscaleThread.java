@@ -19,7 +19,9 @@ public class GrayscaleThread implements Runnable{
 	// if there's something on the converter_queue, take it off, grayscale it, and add it do the save_queue
 	public void run(){
 		while(true){
+			
 			if (!converter_queue.isEmpty()){
+				long startTime = System.currentTimeMillis();  // Start timing
 				try {
 
 
@@ -34,6 +36,11 @@ public class GrayscaleThread implements Runnable{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+
+				long endTime = System.currentTimeMillis();  // Start timing
+
+				long final_time = endTime - startTime;
+				System.out.println(final_time);
 			}
 		}
 	}

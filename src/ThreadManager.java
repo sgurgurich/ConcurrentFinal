@@ -28,13 +28,22 @@ public class ThreadManager {
 	public void spawnThreads(){
 		//TODO: this logic is temporary
 		String full_url = "http://elvis.rowan.edu/~mckeep82/ccpsu17/Astronomy/GS_20150401_SolarHalo_8814_DayNight.jpg";
-		DownloadThread dt = new DownloadThread(full_url, converter_queue);
+		String url_2 = "http://elvis.rowan.edu/~mckeep82/ccpsu17/Astronomy/GS_20150401_SolarHalo_8814_DayNight.jpg";
+		
+		
+		
 		GrayscaleThread gst = new GrayscaleThread(converter_queue, save_queue);
 		SaveThread st = new SaveThread(save_queue);
-		
-		fixedExecutorService.execute(dt);
+
+	
 		fixedExecutorService.execute(gst);
 		fixedExecutorService.execute(st);
+		
+		// add a for loop to loop through all of the images
+		DownloadThread dt = new DownloadThread(full_url, converter_queue);
+		DownloadThread dt2 = new DownloadThread(url_2, converter_queue);
+		fixedExecutorService.execute(dt);
+		fixedExecutorService.execute(dt2);
 
 		
 		fixedExecutorService.shutdown();
