@@ -5,6 +5,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import Threads.DownloadThread;
+import Threads.GrayscaleThread;
+import Threads.SaveThread;
 
 public class ThreadManager {
 	
@@ -27,7 +29,13 @@ public class ThreadManager {
 		//TODO: this logic is temporary
 		String full_url = "http://elvis.rowan.edu/~mckeep82/ccpsu17/Astronomy/GS_20150401_SolarHalo_8814_DayNight.jpg";
 		DownloadThread dt = new DownloadThread(full_url, converter_queue);
+		GrayscaleThread gst = new GrayscaleThread(converter_queue, save_queue);
+		SaveThread st = new SaveThread(save_queue);
+		
 		fixedExecutorService.execute(dt);
+		fixedExecutorService.execute(gst);
+		fixedExecutorService.execute(st);
+
 		
 		fixedExecutorService.shutdown();
 		try {
@@ -35,11 +43,6 @@ public class ThreadManager {
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
-		
-		for (int i = 0; i < converter_queue.size(); i++){
-			System.out.println(converter_queue.size());
 		}
 		
 		

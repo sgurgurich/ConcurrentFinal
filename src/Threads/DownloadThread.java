@@ -1,6 +1,7 @@
 package Threads;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
 
