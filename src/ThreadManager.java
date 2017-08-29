@@ -12,7 +12,9 @@ import Threads.SaveThread;
 public class ThreadManager {
 	
 	private int max_threads;
-	private ExecutorService fixedExecutorService;
+	private ExecutorService download_pool;
+	private ExecutorService converter_pool;
+	private ExecutorService save_pool;
 	private ArrayBlockingQueue<ImageInfo> converter_queue;
 	private ArrayBlockingQueue<ImageInfo> save_queue;
 	private ArrayList<String> file_list;
@@ -21,7 +23,9 @@ public class ThreadManager {
 	public ThreadManager(ArrayList<String> file_list){
 		// sets the threadpool to the best size for your System
 		this.max_threads = Runtime.getRuntime().availableProcessors();
-		fixedExecutorService = Executors.newFixedThreadPool(this.max_threads);
+		download_pool = Executors.newFixedThreadPool(this.max_threads);
+		converter_pool = Executors.newSingleThreadExecutor();
+		save_pool = Executors.newSingleThreadExecutor();
 		converter_queue = new ArrayBlockingQueue<ImageInfo>(50);
 		save_queue = new ArrayBlockingQueue<ImageInfo>(50);
 		this.file_list = file_list;
@@ -32,21 +36,26 @@ public class ThreadManager {
 		GrayscaleThread gst = new GrayscaleThread(converter_queue, save_queue);
 		SaveThread st = new SaveThread(save_queue);
 
-		fixedExecutorService.execute(gst);
-		fixedExecutorService.execute(st);
+		converter_pool.execute(gst);
+		save_pool.execute(st);
 		
 		for (int i = 0; i < file_list.size(); i++){
 			DownloadThread dt = new DownloadThread(file_list.get(i), converter_queue);
-			fixedExecutorService.execute(dt);
+			download_pool.execute(dt);
 		}
 		
 		
 		//Shutdowns
-		fixedExecutorService.shutdown();
+
 		try {
-			fixedExecutorService.awaitTermination(10, TimeUnit.SECONDS);
-			gst.stop();
-			st.stop();
+			download_pool.shutdown();
+			download_pool.awaitTermination(300, TimeUnit.SECONDS);
+			
+			converter_pool.shutdown();
+			converter_pool.awaitTermination(15, TimeUnit.SECONDS);
+			
+			save_pool.shutdown();
+			save_pool.awaitTermination(15, TimeUnit.SECONDS);
 			
 		} catch (InterruptedException e) {
 
