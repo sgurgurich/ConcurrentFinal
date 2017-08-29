@@ -42,9 +42,6 @@ public class DownloadThread implements Runnable{
 		
 	}
 	
-	// overloaded to stop this thread if there's an issue
-	public void stop(){
-		
-	}
+
 
 }

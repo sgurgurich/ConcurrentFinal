@@ -20,31 +20,9 @@ public class GrayscaleThread implements Runnable{
 
 	// if there's something on the converter_queue, take it off, grayscale it, and add it do the save_queue
 	public void run(){
-		while(!exit){
-			
+		while(!exit){		
 			if (!converter_queue.isEmpty()){
-		
-				try {
-
-					ImageInfo tmp = converter_queue.take();
-					BufferedImage img = tmp.getImg();
-					ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-					ColorConvertOp op = new ColorConvertOp(cs, null);
-                    try{
-                    	img = op.filter(img, null);
-                    	tmp.setImg(img);
-                    	save_queue.put(tmp);
-                    }
-                    catch(NullPointerException ne){
-                    	System.out.println("Attempt to process image file unsuccessful. File extension not valid.");
-                    }
-
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-
+				processImg();
 			}
 		}
 	}
@@ -52,7 +30,33 @@ public class GrayscaleThread implements Runnable{
 	// overloaded to stop this thread if there's an issue
 	public void stop(){
 		this.exit = true;
+		while(!converter_queue.isEmpty()){
+			processImg();
+		}
 	}
+	
+	private synchronized void processImg(){
+		try {
+
+			ImageInfo tmp = converter_queue.take();
+			BufferedImage img = tmp.getImg();
+			ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+			ColorConvertOp op = new ColorConvertOp(cs, null);
+            try{
+            	img = op.filter(img, null);
+            	tmp.setImg(img);
+            	save_queue.put(tmp);
+            }
+            catch(NullPointerException ne){
+            	System.out.println("Attempt to process image file unsuccessful. File extension not valid.");
+            }
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 }
 
 

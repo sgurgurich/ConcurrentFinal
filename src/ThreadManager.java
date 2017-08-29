@@ -1,4 +1,4 @@
-import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,41 +15,41 @@ public class ThreadManager {
 	private ExecutorService fixedExecutorService;
 	private ArrayBlockingQueue<ImageInfo> converter_queue;
 	private ArrayBlockingQueue<ImageInfo> save_queue;
+	private ArrayList<String> file_list;
 	
 	
-	
-	public ThreadManager(){
+	public ThreadManager(ArrayList<String> file_list){
 		// sets the threadpool to the best size for your System
 		this.max_threads = Runtime.getRuntime().availableProcessors();
 		fixedExecutorService = Executors.newFixedThreadPool(this.max_threads);
 		converter_queue = new ArrayBlockingQueue<ImageInfo>(50);
 		save_queue = new ArrayBlockingQueue<ImageInfo>(50);
+		this.file_list = file_list;
 	}
 
 	public void spawnThreads(){
-		//TODO: this logic is temporary
-		String img1_name = "GS_20150401_SolarHalo_8814_DayNight.jpg";
-		String img2_name = "Thumbs.db";
-		
-		
+
 		GrayscaleThread gst = new GrayscaleThread(converter_queue, save_queue);
 		SaveThread st = new SaveThread(save_queue);
 
 		fixedExecutorService.execute(gst);
 		fixedExecutorService.execute(st);
 		
-		// add a for loop to loop through all of the images
-		DownloadThread dt = new DownloadThread(img1_name, converter_queue);
-		DownloadThread dt2 = new DownloadThread(img2_name, converter_queue);
-		fixedExecutorService.execute(dt);
-		fixedExecutorService.execute(dt2);
-
+		for (int i = 0; i < file_list.size(); i++){
+			DownloadThread dt = new DownloadThread(file_list.get(i), converter_queue);
+			fixedExecutorService.execute(dt);
+		}
+		
+		
+		//Shutdowns
 		fixedExecutorService.shutdown();
 		try {
-			fixedExecutorService.awaitTermination(3, TimeUnit.SECONDS);
+			fixedExecutorService.awaitTermination(10, TimeUnit.SECONDS);
+			gst.stop();
+			st.stop();
+			
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		}
 		
 		

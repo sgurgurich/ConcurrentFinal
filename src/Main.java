@@ -1,18 +1,17 @@
-
+import java.util.ArrayList;
 
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-        System.out.println("Hello World");
+   
+        ArrayList<String> file_list = new ArrayList<String>();
         
-        
-        
-        ThreadManager tm = new ThreadManager();
+        //Populate the file list
+		file_list.add("GS_20150401_SolarHalo_8814_DayNight.jpg");
+		file_list.add("Thumbs.db");
+    
+        ThreadManager tm = new ThreadManager(file_list);
         tm.spawnThreads();
-        
-        
-        //ArrayBlockingQueue<BufferedImage>
 
 	}
 
