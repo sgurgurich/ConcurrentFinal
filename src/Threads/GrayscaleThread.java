@@ -10,6 +10,7 @@ public class GrayscaleThread implements Runnable{
 	private ArrayBlockingQueue<ImageInfo> converter_queue;
 	private ArrayBlockingQueue<ImageInfo> save_queue;
 	private boolean exit;
+	
 
 	// takes an image
 	public GrayscaleThread(ArrayBlockingQueue<ImageInfo> converter_queue, ArrayBlockingQueue<ImageInfo> save_queue){
@@ -20,25 +21,53 @@ public class GrayscaleThread implements Runnable{
 
 	// if there's something on the converter_queue, take it off, grayscale it, and add it do the save_queue
 	public void run(){
+		
+		
 		while(!exit){		
 			if (!converter_queue.isEmpty()){
-				processImg();
+				ImageInfo tmp = null;
+				synchronized(converter_queue){
+					if (!converter_queue.isEmpty()){
+						try {
+							tmp = converter_queue.take();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+                if (!tmp.equals(null)){
+				  processImg(tmp);
+                }
+                else{
+                	this.exit = true;
+                }
 			}
 		}
 	}
 	
 	// overloaded to stop this thread if there's an issue
-	public void stop(){
+	public void stop() throws InterruptedException{
 		this.exit = true;
 		while(!converter_queue.isEmpty()){
-			processImg();
+			ImageInfo tmp = null;
+			synchronized(converter_queue){
+				if (!converter_queue.isEmpty()){
+
+					tmp = converter_queue.take();
+
+				}
+			}
+            if (!tmp.equals(null)){
+			  processImg(tmp);
+            }
+ 
 		}
 	}
 	
-	private synchronized void processImg(){
-		try {
+	private  void processImg(ImageInfo tmp){
 
-			ImageInfo tmp = converter_queue.take();
+		try {
 			BufferedImage img = tmp.getImg();
 			ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
 			ColorConvertOp op = new ColorConvertOp(cs, null);
@@ -55,6 +84,7 @@ public class GrayscaleThread implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 	
 }

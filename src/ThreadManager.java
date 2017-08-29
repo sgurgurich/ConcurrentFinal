@@ -9,6 +9,12 @@ import Threads.GrayscaleThread;
 import Threads.ImageInfo;
 import Threads.SaveThread;
 
+/**
+ * 
+ * 
+ * @author sgurgurich
+ *
+ */
 public class ThreadManager {
 	
 	private int max_threads;
@@ -51,14 +57,20 @@ public class ThreadManager {
 			download_pool.shutdown();
 			download_pool.awaitTermination(300, TimeUnit.SECONDS);
 			
+		
+			gst.stop();
 			converter_pool.shutdown();
-			converter_pool.awaitTermination(15, TimeUnit.SECONDS);
+			converter_pool.awaitTermination(300, TimeUnit.SECONDS);
 			
+			
+			st.stop();
 			save_pool.shutdown();
-			save_pool.awaitTermination(15, TimeUnit.SECONDS);
+			save_pool.awaitTermination(300, TimeUnit.SECONDS);
 			
 		} catch (InterruptedException e) {
-
+			download_pool.shutdownNow();
+			converter_pool.shutdownNow();
+			save_pool.shutdownNow();
 		}
 		
 		
