@@ -7,47 +7,51 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class GrayscaleThread implements Runnable{
 
-	private ArrayBlockingQueue<BufferedImage> converter_queue;
-	private ArrayBlockingQueue<BufferedImage> save_queue;
+	private ArrayBlockingQueue<ImageInfo> converter_queue;
+	private ArrayBlockingQueue<ImageInfo> save_queue;
+	private boolean exit;
 
 	// takes an image
-	public GrayscaleThread(ArrayBlockingQueue<BufferedImage> converter_queue, ArrayBlockingQueue<BufferedImage> save_queue){
+	public GrayscaleThread(ArrayBlockingQueue<ImageInfo> converter_queue, ArrayBlockingQueue<ImageInfo> save_queue){
 		this.converter_queue = converter_queue;
 		this.save_queue = save_queue;
+		this.exit = false;
 	}
 
 	// if there's something on the converter_queue, take it off, grayscale it, and add it do the save_queue
 	public void run(){
-		while(true){
+		while(!exit){
 			
 			if (!converter_queue.isEmpty()){
-				long startTime = System.currentTimeMillis();  // Start timing
+		
 				try {
 
-
-					BufferedImage tmp = converter_queue.take();
+					ImageInfo tmp = converter_queue.take();
+					BufferedImage img = tmp.getImg();
 					ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
 					ColorConvertOp op = new ColorConvertOp(cs, null);
-
-					tmp = op.filter(tmp, null);
-					save_queue.put(tmp);
+                    try{
+                    	img = op.filter(img, null);
+                    	tmp.setImg(img);
+                    	save_queue.put(tmp);
+                    }
+                    catch(NullPointerException ne){
+                    	System.out.println("Attempt to process image file unsuccessful. File extension not valid.");
+                    }
 
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
-				long endTime = System.currentTimeMillis();  // Start timing
 
-				long final_time = endTime - startTime;
-				System.out.println(final_time);
 			}
 		}
 	}
 	
 	// overloaded to stop this thread if there's an issue
 	public void stop(){
-		
+		this.exit = true;
 	}
 }
 

@@ -1,6 +1,6 @@
 package Threads;
 
-import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -8,27 +8,26 @@ import java.util.concurrent.ArrayBlockingQueue;
 import javax.imageio.ImageIO;
 
 public class SaveThread implements Runnable{
-    
-	private ArrayBlockingQueue<BufferedImage> save_queue;
+
+	private ArrayBlockingQueue<ImageInfo> save_queue;
+	private boolean exit;
 
 	// takes a target image
-	public SaveThread(ArrayBlockingQueue<BufferedImage> save_queue){
+	public SaveThread(ArrayBlockingQueue<ImageInfo> save_queue){
 		this.save_queue = save_queue;
+		this.exit = false;
 	}
 
 	// saves the file and removes it from 'converted list'
 	public void run(){
-		while(true){
+		while(!exit){
 			if (!save_queue.isEmpty()){
-				
-				long startTime = System.currentTimeMillis();  // Start timing
-				BufferedImage tmp;
 				try {
-
+					ImageInfo tmp;
 					tmp = save_queue.take();
-					File outputfile = new File("C:/Users/sgurgurich/Desktop/saved.jpg");
-					ImageIO.write(tmp, "jpg", outputfile);
-
+					File outputfile = new File("./ProcessedImgs/" + tmp.getName());
+					ImageIO.write(tmp.getImg(), "jpg", outputfile);
+					System.out.println("Saved: " + tmp.getName());
 
 				}
 				catch (IOException e) {
@@ -39,19 +38,14 @@ public class SaveThread implements Runnable{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
 
-				long endTime = System.currentTimeMillis();  // Start timing
-
-				long final_time = endTime - startTime;
-				System.out.println(final_time);
 			}
 		}
 	}
 	
 	// overloaded to stop this thread if there's an issue
 	public void stop(){
-		
+		this.exit = true;
 	}
 	
 }
