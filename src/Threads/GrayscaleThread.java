@@ -48,7 +48,7 @@ public class GrayscaleThread implements Runnable{
             	save_queue.put(tmp);
             }
             catch(NullPointerException ne){
-            	System.out.println("Attempt to process image file unsuccessful. File extension not valid.");
+            	System.out.println("Attempt to process image file " + tmp.getName() + " unsuccessful. File extension not valid.");
             }
 
 		} catch (InterruptedException e) {
