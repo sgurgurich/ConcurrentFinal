@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 
+import Threads.SingleThreaded;
+
 public class Main {
 
 	public static void main(String[] args) {
@@ -28,7 +30,15 @@ public class Main {
 		file_list.add("rNGC-4725-HaL(AOX)RGBpugh1024.jpg");
 		file_list.add("snowtrees_bonfadini_960.jpg");
 		file_list.add("tafreshi_MG_3456Pc2s.jpg");
-    
+		
+		
+		System.out.println("Running a single threaded converter!");
+		SingleThreaded st = new SingleThreaded(file_list);
+        st.run();
+        System.out.println("Single threaded converter complete!");
+        
+        System.out.println("");
+        System.out.println("Starting a multi-threaded converter!");
         ThreadManager tm = new ThreadManager(file_list);
         tm.spawnThreads();
 
