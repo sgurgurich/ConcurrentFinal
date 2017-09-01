@@ -8,13 +8,22 @@ import Threads.DownloadThread;
 import Threads.GrayscaleThread;
 import Threads.ImageInfo;
 import Threads.SaveThread;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * 
+ * ThreadManager generates thread pools used
+ * for the downloading, converting, and saving
+ * of a list of images based on their file name.
+ * An ExecutorService is used for each different 
+ * type of task. 
  * 
- * @author sgurgurich
+ * @author Zach Adam
+ * @author John Cutsavage
+ * @author Stefan Gurgurich
  *
  */
+@ThreadSafe
 public class ThreadManager {
 	
 	private int max_threads;
@@ -26,6 +35,18 @@ public class ThreadManager {
 	private ArrayList<String> file_list;
 	
 	
+	/**
+	 * Constructor for creating a ThreadManager object.
+	 * Upon creation, an ExecutorService is created for
+	 * each the downloading service, the grayscale
+	 * converting service, and the saving service. The
+	 * pool for DownloadThreads is a FixedThreadPool
+	 * that accomodates the number of available threads
+	 * the user's computer has available.
+	 * 
+	 * @param file_list a list of file names to pass to
+	 * the image downloading threads.
+	 */
 	public ThreadManager(ArrayList<String> file_list){
 		// sets the threadpool to the best size for your System
 		this.max_threads = Runtime.getRuntime().availableProcessors();
@@ -37,6 +58,16 @@ public class ThreadManager {
 		this.file_list = file_list;
 	}
 
+	/**
+	 * Creates and runs instances of DownloadThreads and
+	 * a single instance of both a GrayscaleThread and
+	 * SaveThread. The number of DownloadThreads created
+	 * is dependent on how large file_list is. Once all
+	 * threads are allocated, each ExecutorService will
+	 * try to ensure the threads exit gracefully. In the
+	 * event of long runtimes, the thread pools will
+	 * timeout and terminate after 300 seconds. 
+	 */
 	public void spawnThreads(){
 
 		GrayscaleThread gst = new GrayscaleThread(converter_queue, save_queue);

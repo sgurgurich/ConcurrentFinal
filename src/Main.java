@@ -2,6 +2,22 @@ import java.util.ArrayList;
 
 import Threads.SingleThreaded;
 
+/**
+ * 
+ * The Main class is used to run first a 
+ * single-threaded and then a multi-threaded 
+ * instance of a grayscale image converter. 
+ * In this program, a connection is opened to 
+ * http://elvis.rowan.edu/~mckeep82/ccpsu17/Astronomy/ . 
+ * Images are then downloaded, converted to grayscale,
+ * and saved to a local folder. Only contains a main()
+ * method to execute both converters.
+ * 
+ * @author Zach Adam
+ * @author John Cutsavage
+ * @author Stefan Gurgurich
+ *
+ */
 public class Main {
 
 	public static void main(String[] args) {

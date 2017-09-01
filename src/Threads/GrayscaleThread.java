@@ -5,6 +5,25 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import net.jcip.annotations.ThreadSafe;
+
+/**
+ * 
+ * GrayscaleThread is an implementation of
+ * Runnable that retrieves images from a queue
+ * sent by a DownloadThread, converts the image
+ * to grayscale, then places the converted image
+ * on a new queue to be used by a SaveThread. In
+ * this respect, GrayscaleThread is both a producer
+ * and consumer. There should only be one instance
+ * of a GrayscaleThread at a time.
+ * 
+ * @author Zach Adam
+ * @author John Cutsavage
+ * @author Stefan Gurgurich
+ *
+ */
+@ThreadSafe
 public class GrayscaleThread implements Runnable{
 
 	private ArrayBlockingQueue<ImageInfo> converter_queue;
@@ -12,14 +31,30 @@ public class GrayscaleThread implements Runnable{
 	private boolean exit;
 	
 
-	// takes an image
+	/**
+	 * Constructor for GrayscaleThread. Takes two
+	 * ArrayBlockingQueues of ImageInfo objects; one
+	 * to pull download images, and one to push
+	 * converted images onto in order to be saved
+	 * to the computer.
+	 * 
+	 * @param converter_queue the queue used to retrieve
+	 * images
+	 * @param save_queue the queue used to send images
+	 * to the SaveThread
+	 */
 	public GrayscaleThread(ArrayBlockingQueue<ImageInfo> converter_queue, ArrayBlockingQueue<ImageInfo> save_queue){
 		this.converter_queue = converter_queue;
 		this.save_queue = save_queue;
 		this.exit = false;
 	}
 
-	// if there's something on the converter_queue, take it off, grayscale it, and add it do the save_queue
+	/**
+	 * Overrides Runnable.run(). While the converter queue
+	 * still contains images, GrayscaleThread will pull
+	 * the next image from the queue and convert it to grayscale.
+	 * 
+	 */
 	public void run(){
 		
 		
@@ -46,7 +81,15 @@ public class GrayscaleThread implements Runnable{
 		}
 	}
 	
-	// overloaded to stop this thread if there's an issue
+	/**
+	 * 
+	 * Override of Runnable.stop(). Causes the current
+	 * thread to stop, allowing it to finish processing 
+	 * the current task before exiting.
+	 * 
+	 * @throws InterruptedException thrown when
+	 * the thread is interrupted. 
+	 */
 	public void stop() throws InterruptedException{
 		this.exit = true;
 		while(!converter_queue.isEmpty()){
@@ -58,13 +101,23 @@ public class GrayscaleThread implements Runnable{
 
 				}
 			}
-            if (!tmp.equals(null)){
+            if (tmp != null){
 			  processImg(tmp);
             }
  
 		}
 	}
 	
+	/**
+	 * 
+	 * Converts the passed in image to grayscale. Once
+	 * the image has been processed, the grayscale
+	 * version is put onto save_queue to be used by
+	 * a SaveThread.
+	 * 
+	 * @param tmp temporary image that will be converted
+	 * to grayscale.
+	 */
 	private  void processImg(ImageInfo tmp){
 
 		try {
